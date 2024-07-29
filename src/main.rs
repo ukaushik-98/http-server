@@ -1,5 +1,5 @@
 // Uncomment this block to pass the first stage
-use std::{io::Write, net::TcpListener};
+use std::{io::{BufRead, BufReader, Read, Write}, net::TcpListener};
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -11,7 +11,15 @@ fn main() {
         match stream {
             Ok(mut stream) => {
                 println!("accepted new connection");
-                let _ = stream.write("HTTP/1.1 200 OK\r\n\r\n".as_bytes());
+                let buf_reader = BufReader::new(&mut stream);
+                let request_line = buf_reader.lines().next().unwrap().unwrap();
+
+                let response = match request_line.as_str() {
+                    "GET / HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\n",
+                    _ => "HTTP/1.1 404 Not Found\r\n\r\n",
+                };
+
+                stream.write_all(response.as_bytes()).unwrap();
             }
             Err(e) => {
                 println!("error: {}", e);
