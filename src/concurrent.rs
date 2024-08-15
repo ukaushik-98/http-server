@@ -13,6 +13,7 @@ pub async fn concurrent() {
                 
 
             let incoming_request: Vec<&str> = str::from_utf8(&buf).unwrap().split("\r\n").collect();
+            println!("INCOMING REQUEST: {:?}", incoming_request)
             let path: Vec<&str> = incoming_request[0].split_ascii_whitespace().collect();
             
             match path[0] {
