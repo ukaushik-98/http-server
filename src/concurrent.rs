@@ -25,9 +25,8 @@ pub async fn concurrent() {
                     } else if path[1] == "/" {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else {
-                        stream.write_all(b"").await;
+                        stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     }
-                    
                 },
                 _ => {
                     stream.write_all(b"HTTP/1.1 404 Not Found\r\n\r\n").await;
