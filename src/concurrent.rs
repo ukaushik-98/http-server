@@ -15,15 +15,15 @@ pub async fn concurrent() {
             
             match path[0] {
                 "GET" => {
-                    if path[1][..6].to_string() == "/echo/" {
+                    if path[1] == "/" && path[1].len() == 1 {
+                        stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
+                    } else if path[1][..6].to_string() == "/echo/" {
                         let echo_val = path[1][6..].to_string();
                         let res_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", echo_val.len(), echo_val);
                         match stream.write_all(res_body.as_bytes()).await {
                             Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
-                    } else if path[1] == "/" {
-                        stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else {
                         stream.write_all(b"HTTP/1.1 404 Not Found\r\n\r\n").await;
                     }
