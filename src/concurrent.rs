@@ -28,7 +28,7 @@ pub async fn concurrent() {
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
                     } else if path[1][..11].to_string() == "/user-agent" {
-                        let header_vec: Vec<&str> = incoming_request[3].split(" ").collect(); 
+                        let header_vec: Vec<&str> = incoming_request[2].split(" ").collect(); 
                         println!("HEADER VEC: {:?}", header_vec);
                         let header_val = header_vec[1];
                         let res_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", header_val.len(), header_val);
