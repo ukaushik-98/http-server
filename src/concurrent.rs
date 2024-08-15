@@ -18,7 +18,7 @@ pub async fn concurrent() {
                 "GET" => {
                     if path[1][..6].to_string() == "/echo/" {
                         let echo_val = path[1][6..].to_string();
-                        let res_body = format!("HTTP/1.1 200 OK\\r\\nContent-Type: text/plain\\r\\nContent-Length: {}\\r\\n\\r\\{}\\r\\n", echo_val.len(), echo_val);
+                        let res_body = format!("HTTP/1.1 200 OK\\r\\nContent-Type: text/plain\\r\\nContent-Length: {}\\r\\n\\{}", echo_val.len(), echo_val);
                         stream.write_all(res_body.as_bytes()).await
                     } else if path[1] == "/" {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await
