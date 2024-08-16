@@ -1,11 +1,13 @@
 use core::str;
 
-use tokio::{io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader}, net::TcpListener};
+use tokio::{fs::read_to_string, io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader}, net::TcpListener};
 
-pub async fn concurrent() {
+pub async fn concurrent(directory: String) {
     let listener = TcpListener::bind("127.0.0.1:4221").await.unwrap();
     loop {
         let (mut stream, _) = listener.accept().await.unwrap();
+        let dir_clone = "/tmp/";
+        //let dir_clone = directory.clone();
         tokio::spawn(async move {
             let mut buf = Vec::with_capacity(1024);
             let mut buf_reader = BufReader::new(&mut stream);
@@ -34,6 +36,23 @@ pub async fn concurrent() {
                         let res_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", header_val.len(), header_val);
                         match stream.write_all(res_body.as_bytes()).await {
                             Ok(_) => println!("SUCCESFULLY ECHOED: {}", header_val),
+                            Err(_) => println!("FAILED TO WRITE RESPONSE!"),
+                        } 
+                    } else if path[1].len() == 10 && path[1][..7].to_string() == "/files/" {
+                        let file_name = dir_clone.to_string() + &path[1][7..];
+                        println!("FILE_NAME: {}", file_name);
+                        let content = read_to_string(file_name).await;
+                        let res_body = match content {
+                            Ok(c) => {
+                                format!("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {}\r\n\r\n{}\r\n", c.len(), c)
+                            },
+                            Err(_) => {
+                                format!("HTTP/1.1 404 Not Found\r\n\r\n")
+                            },
+                        };
+                        
+                        match stream.write_all(res_body.as_bytes()).await {
+                            Ok(_) => println!("SUCCESFULLY WROTE FILE"),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         } 
                     } else {
