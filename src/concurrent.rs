@@ -50,12 +50,15 @@ pub async fn concurrent(directory: String) {
                         let echo_val = path[1][6..].to_string();
                         let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
                         encoder.write_all(echo_val.as_bytes());
-                        encoder.flush();
                         let encoded_val = encoder.finish().unwrap();
+                        let s = match str::from_utf8(&encoded_val) {
+                            Ok(v) => v,
+                            Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+                        };
                         let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, s.len(), s)
                         } else {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", s.len(), s)
                         };
 
                         match stream.write_all(res_body.as_bytes()).await {
