@@ -59,7 +59,7 @@ pub async fn concurrent(directory: String) {
                         println!("RES BODY: {:?}", res_body);
                         stream.write_all(&res_body.into_bytes()).await;
                         stream.write_all(&encoded_val).await;
-                        stream.write_all(b"\r\n").await;
+                        stream.write_all(b"\r\n").await.unwrap();
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
                         let header_vec: Vec<&str> = incoming_request[2].split(" ").collect();
                         println!("HEADER VEC: {:?}", header_vec);
