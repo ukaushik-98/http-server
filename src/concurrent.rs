@@ -51,17 +51,15 @@ pub async fn concurrent(directory: String) {
                         let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
                         encoder.write_all(echo_val.as_bytes());
                         let encoded_val = encoder.finish().unwrap();
-                        let encoded_val = encoded_val.iter().join(" ");
                         let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{}\r\n", encoding, encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n", encoding, encoded_val.len())
                         } else {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n", encoded_val.len())
                         };
                         println!("RES BODY: {:?}", res_body);
-                        match stream.write_all(&res_body.into_bytes()).await {
-                            Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
-                            Err(_) => println!("FAILED TO WRITE RESPONSE!"),
-                        }
+                        stream.write_all(&res_body.into_bytes()).await;
+                        stream.write_all(&encoded_val).await;
+
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
                         let header_vec: Vec<&str> = incoming_request[2].split(" ").collect();
                         println!("HEADER VEC: {:?}", header_vec);
