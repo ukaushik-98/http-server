@@ -1,6 +1,7 @@
 use core::str;
-use std::vec;
+use std::{io::Write, vec};
 
+use flate2::{write::GzEncoder, Compression};
 use itertools::Itertools;
 use tokio::{
     fs::{self, read_to_string},
@@ -47,10 +48,13 @@ pub async fn concurrent(directory: String) {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else if path[1].len() > 6 && path[1][..6].to_string() == "/echo/" {
                         let echo_val = path[1][6..].to_string();
+                        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+                        encoder.write_all(echo_val.as_bytes());
+                        let encoded_val = encoder.finish().unwrap();
                         let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{}\r\n", encoding, echo_val.len(), echo_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, encoded_val.len(), encoded_val)
                         } else {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", echo_val.len(), echo_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoded_val.len(), encoded_val)
                         };
 
                         match stream.write_all(res_body.as_bytes()).await {
