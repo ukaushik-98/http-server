@@ -57,7 +57,7 @@ pub async fn concurrent(directory: String) {
                             format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoded_val.len(), encoded_val)
                         };
                         println!("RES BODY: {:?}", res_body);
-                        match stream.write_all(res_body.as_bytes()).await {
+                        match stream.write_all(&res_body.into_bytes()).await {
                             Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
