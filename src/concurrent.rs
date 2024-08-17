@@ -61,7 +61,7 @@ pub async fn concurrent(directory: String) {
                     } else {
                         stream.write_all(b"HTTP/1.1 404 Not Found\r\n\r\n").await;
                     }
-                },
+                }
                 "POST" => {
                     if path[1].starts_with(&"/files/") {
                         let file_name = dir_clone.to_string() + &path[1][7..];
