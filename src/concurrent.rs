@@ -41,7 +41,7 @@ pub async fn concurrent(directory: String) {
                             Ok(_) => println!("SUCCESFULLY ECHOED: {}", header_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
-                    } else if path[1].len() == 10 && path[1][..7].to_string() == "/files/" {
+                    } else if path[1].starts_with(&"/files/") {
                         let file_name = dir_clone.to_string() + &path[1][7..];
                         println!("FILE_NAME: {}", file_name);
                         let content = read_to_string(file_name).await;
