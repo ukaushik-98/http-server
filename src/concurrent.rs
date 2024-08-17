@@ -47,7 +47,7 @@ pub async fn concurrent(directory: String) {
                     if path[1] == "/" && path[1].len() == 1 {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else if path[1].len() > 6 && path[1][..6].to_string() == "/echo/" {
-                        let echo_val = path[1][6..].to_string();
+                        let echo_val = format!("{}\r\n", &path[1][6..]);
                         let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
                         encoder.write_all(echo_val.as_bytes());
                         let encoded_val = encoder.finish().unwrap();
@@ -59,7 +59,6 @@ pub async fn concurrent(directory: String) {
                         println!("RES BODY: {:?}", res_body);
                         stream.write_all(&res_body.into_bytes()).await;
                         stream.write_all(&encoded_val).await;
-
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
                         let header_vec: Vec<&str> = incoming_request[2].split(" ").collect();
                         println!("HEADER VEC: {:?}", header_vec);
