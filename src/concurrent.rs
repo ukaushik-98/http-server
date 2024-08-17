@@ -52,7 +52,7 @@ pub async fn concurrent(directory: String) {
                         encoder.write_all(echo_val.as_bytes());
                         let encoded_val = encoder.finish().unwrap();
                         let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n", encoding, echo_val.len())
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n", encoding, encoded_val.len())
                         } else {
                             format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n", echo_val.len())
                         };
