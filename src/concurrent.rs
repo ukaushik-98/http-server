@@ -66,7 +66,7 @@ pub async fn concurrent(directory: String) {
                     if path[1].starts_with(&"/files/") {
                         let file_name = dir_clone.to_string() + &path[1][7..];
                         println!("FILE_NAME: {}", file_name);
-                        let content = fs::write(file_name, incoming_request[7]).await;
+                        let content = fs::write(file_name, incoming_request[5]).await;
                         let res_body = match content {
                             Ok(c) => {
                                 format!("HTTP/1.1 201 Created\r\n\r\n")
