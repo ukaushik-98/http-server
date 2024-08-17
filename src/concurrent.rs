@@ -21,7 +21,11 @@ pub async fn concurrent(directory: String) {
             println!("INCOMING REQUEST: {:?}", incoming_request);
             let path: Vec<&str> = incoming_request[0].split_ascii_whitespace().collect();
             let request_accepted_encoding: Vec<&str> = incoming_request[2].split_ascii_whitespace().collect();
-            let encoding = request_accepted_encoding[1];
+            let encoding = if request_accepted_encoding.len() > 0 {
+                request_accepted_encoding[1]
+            } else {
+                ""
+            };
 
             match path[0] {
                 "GET" => {
