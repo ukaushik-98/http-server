@@ -48,18 +48,17 @@ pub async fn concurrent(directory: String) {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else if path[1].len() > 6 && path[1][..6].to_string() == "/echo/" {
                         let echo_val = path[1][6..].to_string();
-                        let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, echo_val.len(), echo_val)
-                        } else {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", echo_val.len(), echo_val)
-                        };
-
                         let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-                        encoder.write_all(res_body.as_bytes());
+                        encoder.write_all(echo_val.as_bytes());
                         let encoded_val = encoder.finish().unwrap();
+                        let res_body = if encoding == "gzip" {
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, encoded_val.len(), encoded_val)
+                        } else {
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoded_val.len(), encoded_val)
+                        };
                         println!("RES BODY: {:?}", res_body);
-                        match stream.write_all(&encoded_val).await {
-                            Ok(_) => println!("SUCCESFULLY ECHOED: {:?}", encoded_val),
+                        match stream.write_all(res_body.as_bytes()).await {
+                            Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
