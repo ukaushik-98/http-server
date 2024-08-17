@@ -58,8 +58,8 @@ pub async fn concurrent(directory: String) {
                         encoder.write_all(res_body.as_bytes());
                         let encoded_val = encoder.finish().unwrap();
                         println!("RES BODY: {:?}", res_body);
-                        match stream.write_all(res_body.as_bytes()).await {
-                            Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
+                        match stream.write_all(&encoded_val).await {
+                            Ok(_) => println!("SUCCESFULLY ECHOED: {:?}", encoded_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
                         }
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
