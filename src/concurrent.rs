@@ -1,5 +1,6 @@
 use core::str;
 
+use itertools::Itertools;
 use tokio::{
     fs::{self, read_to_string},
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
@@ -22,7 +23,11 @@ pub async fn concurrent(directory: String) {
             let path: Vec<&str> = incoming_request[0].split_ascii_whitespace().collect();
             let request_accepted_encoding: Vec<&str> = incoming_request[2].split_ascii_whitespace().collect();
             let encoding = if request_accepted_encoding.len() > 0 {
-                request_accepted_encoding[1]
+                let some_encoding = request_accepted_encoding.iter().find_position(|x| *x == &"gzip");
+                match some_encoding {
+                    Some(val) => val.1,
+                    None => "",
+                }
             } else {
                 ""
             };
