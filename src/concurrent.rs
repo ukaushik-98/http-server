@@ -20,8 +20,8 @@ pub async fn concurrent(directory: String) {
             let incoming_request: Vec<&str> = str::from_utf8(&buf).unwrap().split("\r\n").collect();
             println!("INCOMING REQUEST: {:?}", incoming_request);
             let path: Vec<&str> = incoming_request[0].split_ascii_whitespace().collect();
-            let accepted_encoding: Vec<&str> = incoming_request[4].split_ascii_whitespace().collect();
-            let encoding = accepted_encoding[1];
+            let request_accepted_encoding: Vec<&str> = incoming_request[2].split_ascii_whitespace().collect();
+            let encoding = request_accepted_encoding[1];
 
             match path[0] {
                 "GET" => {
@@ -29,7 +29,12 @@ pub async fn concurrent(directory: String) {
                         stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await;
                     } else if path[1].len() > 6 && path[1][..6].to_string() == "/echo/" {
                         let echo_val = path[1][6..].to_string();
-                        let res_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{}\r\n", encoding, echo_val.len(), echo_val);
+                        let res_body = if encoding == "gzip" {
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{}\r\n", encoding, echo_val.len(), echo_val)
+                        } else {
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", echo_val.len(), echo_val)
+                        };
+
                         match stream.write_all(res_body.as_bytes()).await {
                             Ok(_) => println!("SUCCESFULLY ECHOED: {}", echo_val),
                             Err(_) => println!("FAILED TO WRITE RESPONSE!"),
