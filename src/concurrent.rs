@@ -60,7 +60,7 @@ pub async fn concurrent(directory: String) {
                             res_body_vec.extend_from_slice(&encoded_val);
                             stream.write_all(&res_body_vec).await;
                         } else {
-                            let request_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n", echo_val.len());
+                            let request_body = format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", echo_val.len(), echo_val);
                             stream.write_all(request_body.as_bytes()).await;
                         }
                         return;
