@@ -53,9 +53,9 @@ pub async fn concurrent(directory: String) {
                         let encoded_val = encoder.finish().unwrap();
                         let encoded_val = encoded_val.iter().join(" ");
                         let res_body = if encoding == "gzip" {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoding, encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: {}\r\nContent-Length: {}\r\n\r\n{}\r\n", encoding, encoded_val.len(), encoded_val)
                         } else {
-                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{:?}\r\n", encoded_val.len(), encoded_val)
+                            format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}\r\n", encoded_val.len(), encoded_val)
                         };
                         println!("RES BODY: {:?}", res_body);
                         match stream.write_all(&res_body.into_bytes()).await {
