@@ -57,8 +57,10 @@ pub async fn concurrent(directory: String) {
                             format!("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n", echo_val.len())
                         };
                         println!("RES BODY: {:?}", res_body);
-                        stream.write_all(&res_body.into_bytes()).await;
-                        stream.write_all(&encoded_val).await;
+                        let res_body = res_body.as_bytes();
+                        let mut res_body_vec = res_body.to_vec();
+                        res_body_vec.extend_from_slice(&encoded_val);
+                        stream.write_all(&res_body_vec).await;
                     } else if path[1].len() == 11 && path[1][..11].to_string() == "/user-agent" {
                         let header_vec: Vec<&str> = incoming_request[2].split(" ").collect();
                         println!("HEADER VEC: {:?}", header_vec);
