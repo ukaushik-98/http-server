@@ -1,4 +1,5 @@
 use core::str;
+use std::vec;
 
 use itertools::Itertools;
 use tokio::{
@@ -24,6 +25,7 @@ pub async fn concurrent(directory: String) {
             let request_accepted_encoding: Vec<&str> = incoming_request[2].split_ascii_whitespace().collect();
             let encoding = if request_accepted_encoding.len() > 0 {
                 let vec_of_encodings: Vec<&str> = request_accepted_encoding[1].split(", ").collect();
+                println!("VEC OF ENCODINGS: {:?}", vec_of_encodings);
                 let some_encoding = vec_of_encodings.iter().find_position(|x| *x == &"gzip");
                 match some_encoding {
                     Some(val) => val.1,
