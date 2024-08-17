@@ -12,10 +12,11 @@ mod multithreaded;
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
-    let directory = if args.len() > 3 {
+    let directory = if args.len() >= 3 {
         args[2].to_string()
     } else {
         "".to_string()
     };
+    println!("DIRECTORY: {}", directory);
     concurrent::concurrent(directory).await;
 }
