@@ -22,7 +22,11 @@ pub async fn concurrent(directory: String) {
             let incoming_request: Vec<&str> = str::from_utf8(&buf).unwrap().split("\r\n").collect();
             println!("INCOMING REQUEST: {:?}", incoming_request);
             let path: Vec<&str> = incoming_request[0].split_ascii_whitespace().collect();
-            let request_accepted_encoding: &str = incoming_request.iter().find(|x| x.starts_with("Accept-Encoding: ")).unwrap();
+            let request_accepted_encoding: &str = match incoming_request.iter().find(|x| x.starts_with("Accept-Encoding: ")) {
+                Some(val) => val,
+                None => "",
+            };
+
             let encoding = if request_accepted_encoding.len() > 0 {
                 let vec_of_encodings: Vec<&str> = request_accepted_encoding.split(": ").collect_vec();
                 println!("REQ ENCODINGS: {:?}", request_accepted_encoding); 
