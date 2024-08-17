@@ -1,7 +1,7 @@
 use core::str;
 
 use tokio::{
-    fs::read_to_string,
+    fs::{self, read_to_string},
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::TcpListener,
 };
@@ -51,6 +51,28 @@ pub async fn concurrent(directory: String) {
                             }
                             Err(_) => {
                                 format!("HTTP/1.1 404 Not Found\r\n\r\n")
+                            }
+                        };
+
+                        match stream.write_all(res_body.as_bytes()).await {
+                            Ok(_) => println!("SUCCESFULLY WROTE FILE"),
+                            Err(_) => println!("FAILED TO WRITE RESPONSE!"),
+                        }
+                    } else {
+                        stream.write_all(b"HTTP/1.1 404 Not Found\r\n\r\n").await;
+                    }
+                },
+                "POST" => {
+                    if path[1].starts_with(&"/files/") {
+                        let file_name = dir_clone.to_string() + &path[1][7..];
+                        println!("FILE_NAME: {}", file_name);
+                        let content = fs::write(file_name, incoming_request[7]).await;
+                        let res_body = match content {
+                            Ok(c) => {
+                                format!("HTTP/1.1 201 Created\r\n\r\n")
+                            }
+                            Err(_) => {
+                                format!("HTTP/1.1 500 Server Error\r\n\r\n")
                             }
                         };
 
